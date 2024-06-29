@@ -10,18 +10,18 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = "mongodb://root:123456@localhost/mydb?retryWrites=true&w=majority"
+  url      = "mongodb://root:123456@localhost:27017/mydb?authSource=admin&retryWrites=false&w=majority"
 }
 
 model User {
-  id        String    @id @map("_id") @db.ObjectId
+  id        String    @id @map("_id")
   email     String    @unique
   username  String    @unique
   password  String
   name      String
   posts     Post[]
-  followers String[]  @db.ObjectId
-  following String[]  @db.ObjectId
+  followers String[]  @db.ObjectId  @default([])
+  following String[]  @db.ObjectId  @default([])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -31,7 +31,7 @@ model User {
 model Post {
   id        String    @id @map("_id") @db.ObjectId
   author    User      @relation(fields: [authorId], references: [id])
-  authorId  String    @db.ObjectId
+  authorId  String
 
   @@map("posts")
 }
