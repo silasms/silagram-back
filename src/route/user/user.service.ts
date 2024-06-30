@@ -97,4 +97,16 @@ export class UserService {
       }
     })
   }
+
+  async followers(id: string) {
+    const user = await this.prismaService.user.findFirst({ where: { id }, select: { followers: true }})
+    if (!user) throw new PreconditionFailedException('User do not exists.')
+    return user
+  }
+
+  async listFollowing(id: string) {
+    const user = await this.prismaService.user.findFirst({ where: { id }, select: { following: true }})
+    if (!user) throw new PreconditionFailedException('User do not exists.')
+    return user
+  }
 }

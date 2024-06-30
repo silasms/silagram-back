@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthenticationBodyDTO } from './dto/authentication-body.dto';
 import { CreateUserBodyDTO } from './dto/create-user-body.dto';
@@ -25,5 +25,15 @@ export class UserController {
   @Post('unfollow')
   async unFollow(@Body() body: { follower: string, id: string }) {
     return await this.userService.unFollow(body)
+  }
+
+  @Get('/followers/:id')
+  async followers(@Param('id') id: string) {
+    return await this.userService.followers(id)
+  }
+
+  @Get('/following/:id')
+  async following(@Param('id') id: string) {
+    return await this.userService.listFollowing(id)
   }
 }
