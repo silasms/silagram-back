@@ -56,7 +56,7 @@ export class UserService {
       where: { id },
       data: {
         followers: {
-          set: [...user.followers, follower ]
+          push: follower
         }
       }
     })
@@ -65,7 +65,7 @@ export class UserService {
       where: { id: follower },
       data: {
         following: {
-          set: [ ...followUser.following, id ]
+          push: id
         }
       }
     })
