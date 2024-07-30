@@ -36,4 +36,14 @@ export class UserController {
   async following(@Param('id') id: string) {
     return await this.userService.listFollowing(id)
   }
+
+  @Post('verifyemail')
+  async isExistEmail(@Body() body: { email: string }) {
+    return await this.userService.isExistEmail(body.email)
+  }
+
+  @Post('verifyusername')
+  async isExistUsername(@Body() body: { username: string }) {
+    return await this.userService.isExistUsername(body.username)
+  }
 }

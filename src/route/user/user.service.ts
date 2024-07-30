@@ -109,4 +109,16 @@ export class UserService {
     if (!user) throw new PreconditionFailedException('User do not exists.')
     return user
   }
+
+  async isExistEmail(email: string) {
+    const user = await this.prismaService.user.findFirst({ where: { email } })
+    if (user) return true
+    return false
+  }
+
+  async isExistUsername(username: string) {
+    const user = await this.prismaService.user.findFirst({ where: { username } })
+    if (user) return true
+    return false
+  }
 }
