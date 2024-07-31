@@ -13,11 +13,15 @@ export class UserService {
     private tokenService: TokenService,
   ) {}
 
-  async login({ email, password }: AuthenticationBodyDTO) {
-    const user = await this.prismaService.user.findFirst({ where: { email }})
-    if (!user) throw new UnauthorizedException('Invalid email or password.')
+  async login({ user, password }: AuthenticationBodyDTO) {
+    const userDb = await this.prismaService.user.findFirst({
+      where: {
+        OR: [ { email: user }, { username: user } ]
+      }
+    })
+    if (!userDb) throw new UnauthorizedException('Invalid email or password.')
     
-    const { password: hash, ...userData} = user
+    const { password: hash, ...userData} = userDb
     if(await verify(hash, password)) 
       return this.tokenService.createToken(userData)
     

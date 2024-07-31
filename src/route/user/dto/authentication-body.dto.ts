@@ -2,10 +2,10 @@ import { Type } from "class-transformer";
 import { IsEmail, IsNotEmpty, IsString, Length } from "class-validator";
 
 export class AuthenticationBodyDTO {
-  @IsEmail()
+  @IsString()
   @IsNotEmpty()
   @Type(() => String)
-  email: string;
+  user: string;
 
   @IsString()
   @IsNotEmpty()
