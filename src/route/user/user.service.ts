@@ -28,6 +28,10 @@ export class UserService {
     throw new UnauthorizedException('Invalid email or password.')
   }
 
+  async decodeToken({ token }: { token: string }) {
+    return await this.tokenService.decodeUser(token)
+  }
+
   async createUser({ name, email, password, username }: CreateUserBodyDTO) {
     const userDb = await this.prismaService.user.findFirst({
       where: {

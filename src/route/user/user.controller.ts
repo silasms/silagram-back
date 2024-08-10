@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthenticationBodyDTO } from './dto/authentication-body.dto';
 import { CreateUserBodyDTO } from './dto/create-user-body.dto';
+import { DecodeTokenBodyDTO } from './dto/decode-token-body.dto';
 
 @Controller('user')
 export class UserController {
@@ -45,5 +46,10 @@ export class UserController {
   @Post('verifyusername')
   async isExistUsername(@Body() body: { username: string }) {
     return await this.userService.isExistUsername(body.username)
+  }
+
+  @Post('decodetoken')
+  async decodeToken(@Body() body: DecodeTokenBodyDTO) {
+    return await this.userService.decodeToken(body)
   }
 }
