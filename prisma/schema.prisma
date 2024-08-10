@@ -14,16 +14,18 @@ datasource db {
 }
 
 model User {
-  id        String    @id @map("_id")
-  email     String    @unique
-  username  String    @unique
-  password  String
-  name      String
-  posts     Post[]
-  followers String[]  @default([])
-  following String[]  @default([])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String    @id @map("_id")
+  email       String    @unique
+  username    String    @unique
+  password    String
+  name        String
+  posts       Post[]
+  followers   User[]    @relation("UserFollows", fields: [followersId], references: [id])
+  followersId String[]
+  following   User[]    @relation("UserFollows", fields: [followingId], references: [id])
+  followingId String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("users")
 }
