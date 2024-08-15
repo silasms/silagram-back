@@ -20,10 +20,8 @@ model User {
   password    String
   name        String
   posts       Post[]
-  followers   User[]    @relation("UserFollows", fields: [followersId], references: [id])
-  followersId String[]
-  following   User[]    @relation("UserFollows", fields: [followingId], references: [id])
-  followingId String[]
+  following   Follows[] @relation("Following")
+  followers   Follows[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -38,4 +36,16 @@ model Post {
   updatedAt DateTime  @updatedAt
 
   @@map("posts")
+}
+
+model Follows {
+  id          String    @id @map("_id")
+  follower    User      @relation(fields: [followerId], references: [id])
+  followerId  String
+  following   User      @relation("Following", fields: [followingId], references: [id])
+  followingId String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("follows")
 }
