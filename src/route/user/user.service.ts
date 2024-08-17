@@ -60,21 +60,11 @@ export class UserService {
     const followUser = await this.prismaService.user.findFirst({ where: { id: follower }, select: { following: true } })
     if (!followUser) throw new PreconditionFailedException('User do not exists.')
 
-    await this.prismaService.user.update({
-      where: { id },
+    await this.prismaService.follows.create({
       data: {
-        followers: {
-          push: follower
-        }
-      }
-    })
-    
-    await this.prismaService.user.update({
-      where: { id: follower },
-      data: {
-        following: {
-          push: id
-        }
+        id: uuidv7(),
+        followerId: follower,
+        followingId: id
       }
     })
   }
@@ -92,7 +82,7 @@ export class UserService {
       where: { id },
       data: {
         followers: {
-          set: [ ...user.followers.filter(idFollow => idFollow !== follower) ]
+          set: [ ...user.followers.filter(({ id }) => id !== follower) ]
         }
       }
     })
@@ -100,7 +90,7 @@ export class UserService {
       where: { id: follower },
       data: {
         following: {
-          set: [ ...followUser.following.filter(idUser => idUser !== id) ]
+          set: [ ...followUser.following.filter(({ id }) => id !== id) ]
         }
       }
     })
