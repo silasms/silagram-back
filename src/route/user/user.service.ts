@@ -5,12 +5,14 @@ import { PrismaService } from 'src/service/prisma/prisma.service';
 import { CreateUserBodyDTO } from './dto/create-user-body.dto';
 import { uuidv7 } from 'uuidv7'
 import { hash, verify } from 'argon2';
+import { PostService } from 'src/routes/post/post.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private prismaService: PrismaService,
     private tokenService: TokenService,
+    private postService: PostService
   ) {}
 
   async login({ user, password }: AuthenticationBodyDTO) {
@@ -96,17 +98,21 @@ export class UserService {
     })
   }
 
-  async followers(id: string) {
-    const user = await this.prismaService.user.findFirst({ where: { id }, select: { followers: true }})
-    if (!user) throw new PreconditionFailedException('User do not exists.')
-    return user
+  async listFollowers(id: string) {
+    const { followers } = await this.prismaService.user.findFirst({
+      where: { id },
+      select: { followers: true },
+      orderBy: { createdAt: 'desc' }
+    })
+    if (!followers) throw new PreconditionFailedException('User do not exists.')
+    return followers
   }
 
   async listFollowing(id: string) {
     const user = await this.prismaService.user.findFirst({ where: { id }, select: { following: true }})
     if (!user) throw new PreconditionFailedException('User do not exists.')
     return user
-  }
+  } 
 
   async isExistEmail(email: string) {
     const user = await this.prismaService.user.findFirst({ where: { email } })
@@ -118,5 +124,18 @@ export class UserService {
     const user = await this.prismaService.user.findFirst({ where: { username } })
     if (user) return true
     return false
+  }
+
+  async getPostsByFollowers(id: string) {
+    const followers = await this.listFollowers(id)
+
+    const posts = await Promise.all(followers.map(async ({ id }) => {
+      return await this.postService.getById(id)
+    }))
+
+    const orderedPosts = posts.flat().sort((a, b) => {
+      return a.id.localeCompare(b.id);
+    })
+    return orderedPosts
   }
 }

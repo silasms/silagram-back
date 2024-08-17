@@ -30,7 +30,7 @@ export class UserController {
 
   @Get('/followers/:id')
   async followers(@Param('id') id: string) {
-    return await this.userService.followers(id)
+    return await this.userService.listFollowers(id)
   }
 
   @Get('/following/:id')
@@ -51,5 +51,10 @@ export class UserController {
   @Post('decodetoken')
   async decodeToken(@Body() body: DecodeTokenBodyDTO) {
     return await this.userService.decodeToken(body)
+  }
+
+  @Get('getposts/:id')
+  async getPosts(@Param('id') id: string) {
+    return await this.userService.getPostsByFollowers(id)
   }
 }
