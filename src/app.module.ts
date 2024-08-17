@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { PrismaModule } from './service/prisma/prisma.module';
 import { UserModule } from './route/user/user.module';
 import { TokenModule } from './service/token/token.module';
-import { PostModule } from './routes/post/post.module';
+import { PostModule } from './route/post/post.module';
 
 @Module({
   imports: [PrismaModule, UserModule, TokenModule, PostModule],

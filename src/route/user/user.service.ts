@@ -5,7 +5,7 @@ import { PrismaService } from 'src/service/prisma/prisma.service';
 import { CreateUserBodyDTO } from './dto/create-user-body.dto';
 import { uuidv7 } from 'uuidv7'
 import { hash, verify } from 'argon2';
-import { PostService } from 'src/routes/post/post.service';
+import { PostService } from 'src/route/post/post.service';
 
 @Injectable()
 export class UserService {
