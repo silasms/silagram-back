@@ -19,19 +19,23 @@ model User {
   username    String    @unique
   password    String
   name        String
-  posts       Post[]
+  posts       Posts[]
   following   Follows[] @relation("Following")
   followers   Follows[]
+  likes       Likes[]
+  comments    Comments[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@map("users")
 }
 
-model Post {
+model Posts {
   id        String    @id @map("_id")
   author    User      @relation(fields: [authorId], references: [id])
   authorId  String
+  likes     Likes[]
+  comments  Comments[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -48,4 +52,27 @@ model Follows {
   updatedAt   DateTime  @updatedAt
   
   @@map("follows")
+}
+
+model Likes {
+  id          String    @id @map("_id")
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  post        Posts     @relation(fields: [postId], references: [id])
+  postId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("likes")
+}
+
+model Comments {
+  id          String    @id @map("_id")
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  post        Posts     @relation(fields: [postId], references: [id])
+  postId      String
+  message     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
