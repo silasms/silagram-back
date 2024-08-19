@@ -9,5 +9,6 @@ import { PostModule } from 'src/route/post/post.module';
   providers: [UserService],
   controllers: [UserController],
   imports: [TokenModule, PrismaModule, PostModule],
+  exports: [UserService]
 })
 export class UserModule {}

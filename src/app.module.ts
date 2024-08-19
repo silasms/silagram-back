@@ -5,9 +5,10 @@ import { PrismaModule } from './service/prisma/prisma.module';
 import { UserModule } from './route/user/user.module';
 import { TokenModule } from './service/token/token.module';
 import { PostModule } from './route/post/post.module';
+import { CommentModule } from './route/comment/comment.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, TokenModule, PostModule],
+  imports: [PrismaModule, UserModule, TokenModule, PostModule, CommentModule],
   controllers: [AppController],
   providers: [AppService],
 })

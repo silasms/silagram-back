@@ -75,4 +75,6 @@ model Comments {
   message     String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@map("comments")
 }

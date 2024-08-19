@@ -138,4 +138,10 @@ export class UserService {
     })
     return orderedPosts
   }
+
+  async findById(id: string) {
+    const user = await this.prismaService.user.findFirst({ where: { id } })
+    if (!user) throw new PreconditionFailedException('User do not exists.')
+    return user
+  }
 }
