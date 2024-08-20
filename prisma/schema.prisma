@@ -19,6 +19,7 @@ model User {
   username    String    @unique
   password    String
   name        String
+  image       String?
   posts       Posts[]
   following   Follows[] @relation("Following")
   followers   Follows[]

@@ -57,4 +57,9 @@ export class UserController {
   async getPosts(@Param('id') id: string) {
     return await this.userService.getPostsByFollowers(id)
   }
+
+  @Get('getbyusername/:username')
+  async getUserByUsername(@Param('username') username: string) {
+    return await this.userService.getUserByUsername(username)
+  }
 }

@@ -144,4 +144,20 @@ export class UserService {
     if (!user) throw new PreconditionFailedException('User do not exists.')
     return user
   }
+
+  async getUserByUsername(username: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: { username },
+      select: {
+        username: true,
+        name: true,
+        posts: true,
+        followers: true,
+        following: true,
+        image: true
+      }
+    })
+    if (!user) throw new PreconditionFailedException('User do not exists.')
+    return user
+  }
 }
