@@ -35,6 +35,7 @@ model Posts {
   id        String    @id @map("_id")
   author    User      @relation(fields: [authorId], references: [id])
   authorId  String
+  image     String
   likes     Likes[]
   comments  Comments[]
   createdAt DateTime  @default(now())
