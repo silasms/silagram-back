@@ -1,4 +1,4 @@
-import { Injectable, PreconditionFailedException, UnauthorizedException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, PreconditionFailedException, UnauthorizedException } from '@nestjs/common';
 import { TokenService } from 'src/service/token/token.service';
 import { AuthenticationBodyDTO } from './dto/authentication-body.dto';
 import { PrismaService } from 'src/service/prisma/prisma.service';
@@ -12,6 +12,7 @@ export class UserService {
   constructor(
     private prismaService: PrismaService,
     private tokenService: TokenService,
+    @Inject(forwardRef(() => PostService))
     private postService: PostService
   ) {}
 

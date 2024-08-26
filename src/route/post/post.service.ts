@@ -1,4 +1,4 @@
-import { Injectable, PreconditionFailedException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, PreconditionFailedException } from '@nestjs/common';
 import { PrismaService } from 'src/service/prisma/prisma.service';
 import { CreatePostBodyDTO } from './dto/create-post-body.dto';
 import { UserService } from '../user/user.service';
@@ -8,6 +8,7 @@ import { uuidv7 } from 'uuidv7';
 export class PostService {
   constructor (
     private prismaService: PrismaService,
+    @Inject(forwardRef(() => UserService))
     private userService: UserService
   ) {}
 
