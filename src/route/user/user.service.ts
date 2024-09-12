@@ -54,46 +54,46 @@ export class UserService {
     return user
   }
 
-  async follow({ follower, id }: { follower: string, id: string }) {
-    if (follower === id ) throw new PreconditionFailedException('Command is failed.')
+  async follow({ followerUsername, username }: { followerUsername: string, username: string }) {
+    if (followerUsername === username ) throw new PreconditionFailedException('Command is failed.')
 
-    const user = await this.prismaService.user.findFirst({ where: { id }, select: { followers: true } })
+    const user = await this.prismaService.user.findFirst({ where: { username }, select: { followers: true, id: true } })
     if (!user) throw new PreconditionFailedException('User do not exists.')
 
-    const followUser = await this.prismaService.user.findFirst({ where: { id: follower }, select: { following: true } })
-    if (!followUser) throw new PreconditionFailedException('User do not exists.')
+    const followUser = await this.prismaService.user.findFirst({ where: { username: followerUsername }, select: { following: true, id: true } })
+    if (!followUser) throw new PreconditionFailedException('Follower do not exists.')
 
     await this.prismaService.follows.create({
       data: {
         id: uuidv7(),
-        followerId: follower,
-        followingId: id
+        followerId: user.id,
+        followingId: followUser.id
       }
     })
   }
 
-  async unFollow({ follower, id }: { follower: string, id: string }) {
-    if (follower === id ) throw new PreconditionFailedException('Command is failed.')
+  async unFollow({ followerUsername, username }: { followerUsername: string, username: string }) {
+    if (followerUsername === username ) throw new PreconditionFailedException('Command is failed.')
 
-    const user = await this.prismaService.user.findFirst({ where: { id }, select: { followers: true } })
+    const user = await this.prismaService.user.findFirst({ where: { username }, select: { followers: true, id: true } })
     if (!user) throw new PreconditionFailedException('User do not exists.')
 
-    const followUser = await this.prismaService.user.findFirst({ where: { id: follower }, select: { following: true } })
+    const followUser = await this.prismaService.user.findFirst({ where: { username: followerUsername }, select: { following: true, id: true } })
     if (!followUser) throw new PreconditionFailedException('User do not exists.')
 
     await this.prismaService.user.update({
-      where: { id },
+      where: { id: user.id },
       data: {
         followers: {
-          set: [ ...user.followers.filter(({ id }) => id !== follower) ]
+          set: [ ...user.followers.filter(({ id }) => id !== followUser.id) ]
         }
       }
     })
     await this.prismaService.user.update({
-      where: { id: follower },
+      where: { id: followUser.id },
       data: {
         following: {
-          set: [ ...followUser.following.filter(({ id }) => id !== id) ]
+          set: [ ...followUser.following.filter(({ id }) => id !== followUser.id) ]
         }
       }
     })
@@ -133,9 +133,12 @@ export class UserService {
     const posts = await Promise.all(followers.map(async ({ id }) => {
       return await this.postService.getById(id)
     }))
+    
+    const postMe = await this.postService.getById(id)
+    posts.push(postMe)
 
     const orderedPosts = posts.flat().sort((a, b) => {
-      return a.id.localeCompare(b.id);
+      return b.id.localeCompare(a.id);
     })
     return orderedPosts
   }

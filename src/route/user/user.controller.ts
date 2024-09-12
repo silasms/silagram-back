@@ -19,12 +19,12 @@ export class UserController {
   }
 
   @Post('follow')
-  async follow(@Body() body: { follower: string, id: string }) {
+  async follow(@Body() body: { followerUsername: string, username: string }) {
     return await this.userService.follow(body)
   }
 
   @Post('unfollow')
-  async unFollow(@Body() body: { follower: string, id: string }) {
+  async unFollow(@Body() body: { followerUsername: string, username: string }) {
     return await this.userService.unFollow(body)
   }
 
