@@ -93,7 +93,7 @@ export class UserService {
   async listFollowing(id: string) {
     const user = await this.prismaService.user.findFirst({ where: { id }, select: { following: true }})
     if (!user) throw new PreconditionFailedException('User do not exists.')
-    return user
+    return user.following
   } 
 
   async isExistEmail(email: string) {
@@ -109,10 +109,10 @@ export class UserService {
   }
 
   async getPostsByFollowers(id: string) {
-    const followers = await this.listFollowers(id)
+    const following = await this.listFollowing(id)
 
-    const posts = await Promise.all(followers.map(async ({ id }) => {
-      return await this.postService.getById(id)
+    const posts = await Promise.all(following.map(async ({ followerId }) => {
+      return await this.postService.getById(followerId)
     }))
     
     const postMe = await this.postService.getById(id)
