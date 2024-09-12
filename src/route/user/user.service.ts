@@ -64,14 +64,8 @@ export class UserService {
 
     const followUser = await this.prismaService.user.findFirst({ where: { username: followerUsername }, select: { following: true, id: true } })
     if (!followUser) throw new PreconditionFailedException('Follower do not exists.')
-
-    await this.prismaService.follows.create({
-      data: {
-        id: uuidv7(),
-        followerId: user.id,
-        followingId: followUser.id
-      }
-    })
+      
+    await this.followService.create(user.id, followUser.id)
   }
 
   async unFollow({ followerUsername, username }: { followerUsername: string, username: string }) {
