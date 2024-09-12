@@ -7,9 +7,10 @@ import { TokenModule } from './service/token/token.module';
 import { PostModule } from './route/post/post.module';
 import { CommentModule } from './route/comment/comment.module';
 import { LikeModule } from './route/like/like.module';
+import { FollowModule } from './route/follow/follow.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, TokenModule, PostModule, CommentModule, LikeModule],
+  imports: [PrismaModule, UserModule, TokenModule, PostModule, CommentModule, LikeModule, FollowModule],
   controllers: [AppController],
   providers: [AppService],
 })
