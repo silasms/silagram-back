@@ -6,6 +6,7 @@ import { CreateUserBodyDTO } from './dto/create-user-body.dto';
 import { uuidv7 } from 'uuidv7'
 import { hash, verify } from 'argon2';
 import { PostService } from 'src/route/post/post.service';
+import { FollowService } from '../follow/follow.service';
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,8 @@ export class UserService {
     private prismaService: PrismaService,
     private tokenService: TokenService,
     @Inject(forwardRef(() => PostService))
-    private postService: PostService
+    private postService: PostService,
+    private followService: FollowService
   ) {}
 
   async login({ user, password }: AuthenticationBodyDTO) {
@@ -75,28 +77,13 @@ export class UserService {
   async unFollow({ followerUsername, username }: { followerUsername: string, username: string }) {
     if (followerUsername === username ) throw new PreconditionFailedException('Command is failed.')
 
-    const user = await this.prismaService.user.findFirst({ where: { username }, select: { followers: true, id: true } })
+    const user = await this.prismaService.user.findFirst({ where: { username }, select: {id: true } })
     if (!user) throw new PreconditionFailedException('User do not exists.')
 
-    const followUser = await this.prismaService.user.findFirst({ where: { username: followerUsername }, select: { following: true, id: true } })
-    if (!followUser) throw new PreconditionFailedException('User do not exists.')
+    const followerUser = await this.prismaService.user.findFirst({ where: { username: followerUsername }, select: {id: true } })
+    if (!followerUser) throw new PreconditionFailedException('User do not exists.')
 
-    await this.prismaService.user.update({
-      where: { id: user.id },
-      data: {
-        followers: {
-          set: [ ...user.followers.filter(({ id }) => id !== followUser.id) ]
-        }
-      }
-    })
-    await this.prismaService.user.update({
-      where: { id: followUser.id },
-      data: {
-        following: {
-          set: [ ...followUser.following.filter(({ id }) => id !== followUser.id) ]
-        }
-      }
-    })
+    await this.followService.deleteByIds(user.id, followerUser.id)
   }
 
   async listFollowers(id: string) {
