@@ -55,6 +55,7 @@ model Follows {
   updatedAt   DateTime  @updatedAt
   
   @@map("follows")
+  @@unique([followerId, followingId])
 }
 
 model Likes {
