@@ -134,6 +134,7 @@ export class UserService {
     const user = await this.prismaService.user.findFirst({
       where: { username },
       select: {
+        id: true,
         username: true,
         name: true,
         posts: true,

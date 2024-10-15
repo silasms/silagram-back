@@ -27,6 +27,8 @@ model User {
   comments    Comments[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  user1Id     Chats[]   @relation("user1")
+  user2Id     Chats[]   @relation("user2")
 
   @@map("users")
 }
@@ -81,4 +83,18 @@ model Comments {
   updatedAt   DateTime  @updatedAt
 
   @@map("comments")
+}
+
+model Chats {
+  id          String    @id @map("_id")
+  user1       User      @relation("user1", fields: [user1Id], references: [id])
+  user1Id     String
+  user2       User      @relation("user2", fields: [user2Id], references: [id])
+  user2Id     String
+  messages    Json
+  createdAt   DateTime  @default(now())
+  lastMessage DateTime  @default(now())
+
+  @@unique([user1Id, user2Id])
+  @@map("chats")
 }
