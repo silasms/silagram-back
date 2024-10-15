@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Multi Room</title>
+</head>
+<body>
+    <h1>Chat Multi Room</h1>
+    <input id="room" placeholder="Enter room name" />
+    <button onclick="connect()">Connect</button>
+    <div id="chat"></div>
+    <input id="message" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        let ws;
+
+        function connect() {
+            const room = document.getElementById("room").value;
+            ws = new WebSocket(`ws://localhost:8080/ws?room=${room}`);
+
+            ws.onmessage = function(event) {
+                const chat = document.getElementById("chat");
+                chat.innerHTML += `<p>${event.data}</p>`;
+            };
+        }
+
+        function sendMessage() {
+            const message = document.getElementById("message").value;
+            ws.send(message);
+        }
+    </script>
+</body>
+</html>
