@@ -65,4 +65,25 @@ export class ChatService {
       }
     })
   }
+
+  async loadMessage({ user1, user2 }) {
+    const dbUser1 = await this.userService.getUserByUsername(user1)
+    const dbUser2 = await this.userService.getUserByUsername(user2)
+
+    return await this.prismaService.chats.findFirst({
+      where: {
+        OR: [
+          {user1Id: dbUser1.id, user2Id: dbUser2.id},
+          {user2Id: dbUser1.id, user1Id: dbUser2.id}
+        ]
+      },
+      include: {
+        messages: {
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
+      }
+    })
+  }
 }

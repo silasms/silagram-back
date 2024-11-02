@@ -21,4 +21,9 @@ export class ChatController {
   async getChatByUser(@Body() data: any) {
     return await this.chatService.getChatByUsers(data)
   }
+
+  @Post('/loadmessage')
+  async loadMessage(@Body() data: any) {
+    return await this.chatService.loadMessage(data)
+  }
 }
