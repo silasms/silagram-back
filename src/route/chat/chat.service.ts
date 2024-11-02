@@ -21,21 +21,18 @@ export class ChatService {
       data: {
         id: uuidv7(),
         user1Id: user1Db.id,
-        user2Id: user2Db.id,
-        messages: ``
+        user2Id: user2Db.id
       }
     })
   }
 
-  async updateChat({ user1, user2, messages }) {
-    const chat = await this.getChatByUsers({user1, user2})
-
+  async updateChat(id: string) {
     return await this.prismaService.chats.update({
       where: {
-        id: chat.id
+        id: id
       },
       data: {
-        messages
+        lastMessage: new Date()
       }
     })
   }

@@ -29,6 +29,7 @@ model User {
   updatedAt   DateTime  @updatedAt
   user1Id     Chats[]   @relation("user1")
   user2Id     Chats[]   @relation("user2")
+  message     Messages[]
 
   @@map("users")
 }
@@ -85,13 +86,25 @@ model Comments {
   @@map("comments")
 }
 
+model Messages {
+  id          String    @id @map("_id")
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  message     String
+  chat        Chats     @relation(fields: [chatId], references: [id])
+  chatId      String
+  createdAt   DateTime  @default(now())
+
+  @@map("messages")
+}
+
 model Chats {
   id          String    @id @map("_id")
   user1       User      @relation("user1", fields: [user1Id], references: [id])
   user1Id     String
   user2       User      @relation("user2", fields: [user2Id], references: [id])
   user2Id     String
-  messages    Json
+  messages    Messages[]
   createdAt   DateTime  @default(now())
   lastMessage DateTime  @default(now())
 

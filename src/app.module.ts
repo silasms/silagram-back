@@ -9,9 +9,10 @@ import { CommentModule } from './route/comment/comment.module';
 import { LikeModule } from './route/like/like.module';
 import { FollowModule } from './route/follow/follow.module';
 import { ChatModule } from './route/chat/chat.module';
+import { MessageModule } from './route/message/message.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, TokenModule, PostModule, CommentModule, LikeModule, FollowModule, ChatModule],
+  imports: [PrismaModule, UserModule, TokenModule, PostModule, CommentModule, LikeModule, FollowModule, ChatModule, MessageModule],
   controllers: [AppController],
   providers: [AppService],
 })
