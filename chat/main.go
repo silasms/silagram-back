@@ -1,23 +1,19 @@
 package main
 
 import (
-	"context"
-	// "encoding/json"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
-	// "go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Estrutura de uma sala de chat
 type Room struct {
 	name     string
+	usernames   map[string]bool
 	clients  map[*Client]bool
 	broadcast chan []byte
 	register  chan *Client
@@ -46,6 +42,7 @@ var upgrader = websocket.Upgrader{
 func newRoom(name string) *Room {
 	return &Room{
 		name:      name,
+		usernames:  make(map[string]bool),
 		clients:   make(map[*Client]bool),
 		broadcast: make(chan []byte),
 		register:  make(chan *Client),
@@ -65,12 +62,22 @@ func (room *Room) runRoom() {
 	for {
 		select {
 		case client := <-room.register:
-			room.clients[client] = true
+			if _, exists := room.usernames[client.username]; exists {
+				fmt.Printf("Username %s já está conectado na sala %s\n", client.username, room.name)
+			} else {
+				room.clients[client] = true
+				room.usernames[client.username] = true
+				fmt.Printf("Cliente %s conectado na sala %s\n", client.username, room.name)
+			}
+
 		case client := <-room.unregister:
 			if _, ok := room.clients[client]; ok {
 				delete(room.clients, client)
+				delete(room.usernames, client.username)
 				close(client.send)
+				fmt.Printf("Cliente %s desconectado da sala %s\n", client.username, room.name)
 			}
+
 		case message := <-room.broadcast:
 			for client := range room.clients {
 				select {
@@ -78,6 +85,7 @@ func (room *Room) runRoom() {
 				default:
 					close(client.send)
 					delete(room.clients, client)
+					delete(room.usernames, client.username)
 				}
 			}
 		}
@@ -106,7 +114,8 @@ func (client *Client) readMessages() {
 		if err != nil {
 			break
 		}
-		client.room.broadcast <- message
+		text, _ := json.Marshal(map[string]string{"message": string(message), "room": client.room.name, "username": client.username})
+		client.room.broadcast <- text
 	}
 }
 
@@ -115,8 +124,6 @@ func (client *Client) writeMessages() {
 	defer func() {
 		client.socket.Close()
 	}()
-
-	// chatCollection := client.mongo.Collection("chats")
 	
 	for {
 		select {
@@ -126,18 +133,12 @@ func (client *Client) writeMessages() {
 				return
 			}
 			client.socket.WriteMessage(websocket.TextMessage, message)
-			// var room bson.M
-			// err := chatCollection.FindOne(context.TODO(), bson.D{{"id", client.room}}).Decode(&room)
-			// if err == mongo.ErrNoDocuments {
-			// 	fmt.Printf("No chat was found with the title %s\n", client.room)
-			// 	return
-			// }
 		}
 	}
 }
 
 // Função para lidar com uma nova conexão WebSocket
-func serveWs(hub *Hub, mongo *mongo.Database, w http.ResponseWriter, r *http.Request) {
+func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	roomName := r.URL.Query().Get("room")
 	username := r.URL.Query().Get("username")
 
@@ -165,37 +166,10 @@ func main() {
   if err != nil {
     log.Fatal("Error loading .env file")
   }
-	uri := os.Getenv("GO_DATABASE_URL")
 	hub := newHub()
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-	if err != nil {
-		log.Fatal("Error to connection mongo")
-	}
-
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
-
-	coll := client.Database("mydb")
-	// username := "silas1"
-	// var result bson.M
-	// err = coll.Collection("users").FindOne(context.TODO(), bson.D{{"username", username}}).Decode(&result)
-	// if err == mongo.ErrNoDocuments {
-	// 	fmt.Printf("No document was found with the title %s\n", username)
-	// 	return
-	// }
-	// jsonData, err := json.MarshalIndent(result, "", "    ")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Printf("%s\n", jsonData)
-
-
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, coll, w, r)
+		serveWs(hub, w, r)
 	})
 
 	fmt.Println("Servidor iniciado na porta :8080")
