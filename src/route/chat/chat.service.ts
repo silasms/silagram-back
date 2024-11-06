@@ -80,7 +80,7 @@ export class ChatService {
       include: {
         messages: {
           orderBy: {
-            createdAt: 'desc'
+            createdAt: 'asc'
           }
         }
       }
